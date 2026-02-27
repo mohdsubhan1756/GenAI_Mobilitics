@@ -25,21 +25,48 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="history"
         options={{
           title: 'History',
           tabBarIcon: ({ color }) => (
-            <Ionicons name="time-outline" size={28} color={color} />
+            <Ionicons name="timer" size={28} color={color} />
+          ),
+        }}
+      /> */}
+      <Tabs.Screen
+        name="explore"
+        options={{
+          title: 'Prescriptions',
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="document-text" size={28} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="tremor"
         options={{
-          title: 'Explore',
+          title: 'Tremor',
           tabBarIcon: ({ color }) => (
-            <Ionicons name="time" size={28} color={color} />
+            <Ionicons name="pulse" size={28} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="prescription"
+        options={{
+          title: 'Upload',
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="cloud-upload" size={28} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="person" size={28} color={color} />
           ),
         }}
       />

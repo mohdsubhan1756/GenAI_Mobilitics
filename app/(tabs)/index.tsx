@@ -1445,7 +1445,7 @@ import { router } from 'expo-router';
 import { Accelerometer, Gyroscope, AccelerometerMeasurement, GyroscopeMeasurement } from 'expo-sensors';
 import * as ss from 'simple-statistics';
 import { useEffect, useRef, useState } from 'react';
-import { Button, Dimensions, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Button, Dimensions, ScrollView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import BASE_URL from '../../config/api';
 
@@ -1467,8 +1467,10 @@ type Prescription = {
 
 /* ===================== CONSTANTS ===================== */
 const SCREEN_WIDTH = Dimensions.get('window').width;
-const WINDOW_SIZE = 128;
-const UPDATE_INTERVAL = 50;
+// const WINDOW_SIZE = 128;
+const WINDOW_SIZE = 32;
+// const UPDATE_INTERVAL = 50;
+const UPDATE_INTERVAL = 16;
 
 /* ===================== COMPONENT ===================== */
 export default function HomeScreen() {
@@ -1533,6 +1535,11 @@ export default function HomeScreen() {
       setGyroData(d);
       if (recording) setGyroWindow(prev => [...prev, { x: d.x, y: d.y, z: d.z, t: Date.now() }].slice(-WINDOW_SIZE));
     });
+
+    console.log("Recording:", recording);
+    console.log("Accel Length:", accelWindow.length);
+    console.log("Gyro Length:", gyroWindow.length);
+    console.log("User:", userId);
 
     return () => {
       accelSub.remove();
@@ -1617,27 +1624,50 @@ export default function HomeScreen() {
   };
 
   /* ===================== SUBMIT FEATURES ===================== */
+  // useEffect(() => {
+  //   if (!recording && accelWindow.length >= WINDOW_SIZE && !submittedRef.current && userId){
+  //     submittedRef.current = true;
+
+  //     const features = extractHARFeatures(accelWindow, gyroWindow);
+  //     if (!features) return;
+
+  //     const score = calculateStabilityScore(features);
+  //     setStabilityScore(score);
+  //     setScoreHistory(prev => [...prev.slice(-9), score]);
+
+  //     fetch(`${BASE_URL}/api/tests/add`, {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ userId, ...features, stabilityScore: score }),
+  //     })
+  //       .then(res => res.json())
+  //       .then((data: TestResponse) => setStatus(data.status))
+  //       .catch(() => setStatus('Evaluation Failed'));
+  //   }
+  // }, [recording, accelWindow, gyroWindow, userId]);
+
   useEffect(() => {
-    if (!recording && accelWindow.length === WINDOW_SIZE && !submittedRef.current && userId) {
-      submittedRef.current = true;
+  if (!recording && accelWindow.length >= 32 && !submittedRef.current && userId) {
+    submittedRef.current = true;
 
-      const features = extractHARFeatures(accelWindow, gyroWindow);
-      if (!features) return;
+    const features = extractHARFeatures(accelWindow, gyroWindow);
+    if (!features) return;
 
-      const score = calculateStabilityScore(features);
-      setStabilityScore(score);
-      setScoreHistory(prev => [...prev.slice(-9), score]);
+    const score = calculateStabilityScore(features);
 
-      fetch(`${BASE_URL}/api/tests/add`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, ...features, stabilityScore: score }),
-      })
-        .then(res => res.json())
-        .then((data: TestResponse) => setStatus(data.status))
-        .catch(() => setStatus('Evaluation Failed'));
-    }
-  }, [recording, accelWindow, gyroWindow, userId]);
+    setStabilityScore(score);
+    setScoreHistory(prev => [...prev.slice(-9), score]);
+
+    fetch(`${BASE_URL}/api/tests/add`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, ...features, stabilityScore: score }),
+    })
+      .then(res => res.json())
+      .then((data: TestResponse) => setStatus(data.status))
+      .catch(() => setStatus('Evaluation Failed'));
+  }
+}, [recording, accelWindow, gyroWindow, userId]);
 
   /* ===================== UI + VISUALIZATION ===================== */
   const createChartData = (arr: number[], label: string) => ({
@@ -1747,13 +1777,23 @@ export default function HomeScreen() {
     // </ScrollView>
 
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 50 }}>
+      {/* <Text style={styles.title}>Balance & Stability Dashboard</Text> */}
   {/* ===================== STABILITY SCORE ===================== */}
-  {stabilityScore !== null && (
+  {/* {stabilityScore !== null && (
     <View style={styles.resultCard}>
       <Text style={styles.scoreText}>Stability Score: {stabilityScore.toFixed(1)}</Text>
       <Text style={styles.statusText}>Status: {status ?? 'Evaluating...'}</Text>
     </View>
-  )}
+  )} */}
+
+  <Text style={styles.title}>Balance & Stability Dashboard</Text>
+
+<TouchableOpacity
+  style={styles.historyButton}
+  onPress={() => router.push('/history')}
+>
+  <Text style={styles.historyButtonText}>View History</Text>
+</TouchableOpacity>
 
   {/* Live sensor values */}
   <View style={styles.card}>
@@ -1864,13 +1904,15 @@ const chartConfig = {
 /* ===================== STYLES ===================== */
 const styles = StyleSheet.create({
   container: { backgroundColor: '#f4f6f8' },
-  title: { fontSize: 26, fontWeight: 'bold', textAlign: 'center', marginVertical: 20 },
+  title: { paddingTop:60, fontSize: 26, fontWeight: 'bold', textAlign: 'center', marginVertical: 20 },
   card: { backgroundColor: '#fff', margin: 15, padding: 20, borderRadius: 16, elevation: 3 },
   chartCard: { backgroundColor: '#fff', margin: 15, padding: 10, borderRadius: 16, elevation: 3 },
   cardTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10 },
   timer: { fontSize: 18, marginBottom: 10 },
   resultCard: {
     width: '90%',
+    alignSelf: 'center',
+    marginVertical: 20,
     padding: 25,
     borderRadius: 15,
     marginTop: 20,
@@ -1879,4 +1921,19 @@ const styles = StyleSheet.create({
   },
   scoreText: { fontSize: 22, fontWeight: 'bold' },
   statusText: { fontSize: 18, marginTop: 8 },
+  historyButton: {
+  backgroundColor: '#1E90FF',
+  paddingVertical: 12,
+  paddingHorizontal: 25,
+  borderRadius: 12,
+  alignSelf: 'center',
+  marginBottom: 10,
+  elevation: 3,
+},
+
+historyButtonText: {
+  color: '#fff',
+  fontSize: 16,
+  fontWeight: '600',
+},
 });

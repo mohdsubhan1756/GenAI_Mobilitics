@@ -26,9 +26,12 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 const cors = require('cors');
 
+
 const testRoutes = require('./routes/testRoutes');
 const prescriptionRoutes = require('./routes/prescriptionRoutes');
 const { router: authRoutes } = require('./routes/authRoutes');
+const tremorRoutes = require('./routes/tremorRoutes.js');
+const userRoutes = require('./routes/userRoutes.js')
 
 const app = express();
 
@@ -46,6 +49,8 @@ mongoose
 app.use('/api/tests', testRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
 app.use('/api/auth', authRoutes);
+app.use("/api/tremor",tremorRoutes);
+app.use('/api/user', userRoutes);
 
 app.listen(5000, () => {
     console.log("Server running on port 5000");
