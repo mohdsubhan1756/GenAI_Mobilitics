@@ -3,36 +3,36 @@ const router = express.Router();
 const { rf, labelMap } = require('../ml/model');
 const Test = require('../models/Test');
 
-router.post('/add', async (req, res) => {
-    console.log("Check");
-    try {
-        const { userId, varianceX, peakToPeakY, swayFrequency, stabilityScore } = req.body;
+// router.post('/add', async (req, res) => {
+//     console.log("Check");
+//     try {
+//         const { userId, varianceX, peakToPeakY, swayFrequency, stabilityScore } = req.body;
 
-        // Predict numeric status
-        const predictionNum = rf.predict([[varianceX, peakToPeakY, swayFrequency]])[0];
+//         // Predict numeric status
+//         const predictionNum = rf.predict([[varianceX, peakToPeakY, swayFrequency]])[0];
 
-        // Decode to string
-        const predictionStr = labelMap[predictionNum];
-        console.log("Req.body", req.body);
+//         // Decode to string
+//         const predictionStr = labelMap[predictionNum];
+//         console.log("Req.body", req.body);
 
-        const test = new Test({
-            userId,
-            varianceX,
-            peakToPeakY,
-            swayFrequency,
-            stabilityScore,
-            status: predictionStr,
-            createdAt: new Date()
-        });
+//         const test = new Test({
+//             userId,
+//             varianceX,
+//             peakToPeakY,
+//             swayFrequency,
+//             stabilityScore,
+//             status: predictionStr,
+//             createdAt: new Date()
+//         });
 
-        await test.save();
+//         await test.save();
 
-        res.json({ status: predictionStr });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: err.message });
-    }
-});
+//         res.json({ status: predictionStr });
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).json({ error: err.message });
+//     }
+// });
 
 // router.get('/', async (req, res) => {
 //     try {
@@ -44,6 +44,33 @@ router.post('/add', async (req, res) => {
 //         res.status(500).json({ error: err.message });
 //     }
 // });
+
+router.post('/add', async (req, res) => {
+  try {
+    const { userId, stabilityScore, ...features } = req.body;
+    const featureArray = Object.values(features).map(Number);
+
+    // Predict
+    const predictionNum = rf.predict([featureArray])[0];
+    const predictionStr = labelMap[predictionNum];
+
+    const test = new Test({
+      userId,
+      ...features,
+      stabilityScore,
+      status: predictionStr,
+      createdAt: new Date(),
+    });
+
+    await test.save();
+    res.json({ status: predictionStr });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+module.exports = router;
 
 router.post('/', async (req, res) => {
     try {

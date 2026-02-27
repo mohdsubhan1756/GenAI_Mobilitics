@@ -117,7 +117,7 @@ export default function HistoryScreen() {
             });
             const data = await res.json();
             setHistory(data);
-            console.log("Token: ",token);
+            // console.log("Token: ",token);
 
         } catch (err) {
             console.error('Fetch error:', err);
