@@ -551,10 +551,10 @@ export default function PrescriptionScreen() {
       const data = await response.json();
       setResult(data);
 
-      router.push({
-        pathname: '/plan-result/[id]',
-        params: { id: data.data._id },
-      });
+      // router.push({
+      //   pathname: '/plan-result/[id]',
+      //   params: { id: data.data._id },
+      // });
     } catch (err: any) {
       Alert.alert('Error', err.message || 'Something went wrong');
     } finally {

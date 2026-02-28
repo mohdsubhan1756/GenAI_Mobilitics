@@ -237,7 +237,7 @@ export default function PrescriptionDetailScreen() {
 
             {/* Raw AI Response */}
 
-            <View style={styles.card}>
+            {/* <View style={styles.card}>
 
                 <Text style={styles.sectionTitle}>
                     🤖 Raw AI Response
@@ -247,7 +247,7 @@ export default function PrescriptionDetailScreen() {
                     {JSON.stringify(prescription.rawResponse, null, 2)}
                 </Text>
 
-            </View>
+            </View> */}
 
         </ScrollView>
 
