@@ -1,7 +1,7 @@
 const mongoose =require("mongoose");
 
 const TremorSchema = new mongoose.Schema({
-
+  userId: mongoose.Schema.Types.ObjectId,
   meanX:Number,
   meanY:Number,
   meanZ:Number,

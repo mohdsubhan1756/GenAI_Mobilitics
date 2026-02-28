@@ -62,6 +62,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="hardware"
+        options={{
+          title: 'Hardware',
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="walk" size={28} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',

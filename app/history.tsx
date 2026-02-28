@@ -100,7 +100,7 @@ export default function HistoryScreen() {
             }
             const payload = JSON.parse(atob(token.split('.')[1])) as { id: string };
             setUserId(payload.id);
-            console.log("Payload id: ", payload.id);
+            // console.log("Payload id: ", payload.id);
 
             // const res = await fetch(`${BASE_URL}/api/tests`,{
             //         method: 'POST',

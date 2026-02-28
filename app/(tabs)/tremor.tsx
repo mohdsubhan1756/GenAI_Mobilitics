@@ -915,6 +915,7 @@
 
 
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import BASE_URL from '../../config/api.js';
 import { Accelerometer } from 'expo-sensors';
 import { useRef, useState } from 'react';
@@ -932,6 +933,7 @@ import {
 } from 'react-native';
 
 import { LineChart } from 'react-native-chart-kit';
+import { router } from 'expo-router';
 
 type Sensor = { x:number,y:number,z:number };
 
@@ -950,16 +952,31 @@ export default function TremorScreen() {
   const [chartY,setChartY] = useState<number[]>([]);
   const [chartZ,setChartZ] = useState<number[]>([]);
 
+  const [userId, setUserId] = useState<string | null>(null);
+
   const screenWidth = Dimensions.get("window").width;
+
 
   const fetchHistory = async () => {
 
     try{
 
-      const res = await fetch(`${BASE_URL}/api/tremor/history`);
-      const data = await res.json();
+      const token = await AsyncStorage.getItem('token');
+            if (!token) {
+                router.replace('/login');
+                return;
+            }
+            const payload = JSON.parse(atob(token.split('.')[1])) as { id: string };
+            setUserId(payload.id);
 
-      setHistory(data);
+            const res = await fetch(`${BASE_URL}/api/tremor/history`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: payload.id }),
+            });
+            const data = await res.json();
+            setHistory(data);
+
       setHistoryVisible(true);
 
     }catch(e){
@@ -1094,7 +1111,8 @@ Affected Level: ${percentage}%`;
         body:JSON.stringify({
           ...features,
           tremorScore,
-          result
+          result,
+          userId
         })
       });
 

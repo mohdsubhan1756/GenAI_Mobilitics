@@ -114,9 +114,14 @@ router.post("/predict", async (req, res) => {
 
 });
 
-router.get("/history", async (req,res)=>{
-  const history = await TremorTest.find().sort({createdAt:-1}).limit(20);
-  res.json(history);
+router.post("/history", async (req,res)=>{
+    try{
+        const { userId } = req.body;
+      const history = await TremorTest.find({userId}).sort({createdAt:-1}).limit(20);
+      res.json(history);
+    } catch {
+         res.status(500).json({ error: err.message });
+    }
 });
 
 module.exports = router;
