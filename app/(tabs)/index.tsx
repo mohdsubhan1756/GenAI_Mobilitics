@@ -1591,7 +1591,6 @@ export default function HomeScreen() {
     return features;
   };
 
-  /* ===================== STABILITY SCORE ===================== */
   const calculateStabilityScore = (features: HARFeatures): number => {
     try {
       const axes = ['x', 'y', 'z'];
@@ -1602,7 +1601,6 @@ export default function HomeScreen() {
     } catch { return 0; }
   };
 
-  /* ===================== RECORDING CONTROL ===================== */
   const startRecording = () => {
     submittedRef.current = false;
     setAccelWindow([]);
@@ -1669,7 +1667,6 @@ export default function HomeScreen() {
   }
 }, [recording, accelWindow, gyroWindow, userId]);
 
-  /* ===================== UI + VISUALIZATION ===================== */
   const createChartData = (arr: number[], label: string) => ({
     labels: arr.map((_, i) => (i + 1).toString()),
     datasets: [{ data: arr }],
